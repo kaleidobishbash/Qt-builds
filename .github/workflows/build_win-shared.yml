@@ -92,7 +92,7 @@ jobs:
           -no-freetype ^
           -no-harfbuzz ^
           -no-gtk ^
-          -opengl-desktop ^
+          -opengl dynamic ^
           -no-direct2d ^
           -no-eglfs ^
           -no-ico ^
