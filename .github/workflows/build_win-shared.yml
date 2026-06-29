@@ -27,10 +27,10 @@ jobs:
           ren "${{ env.openssl_location }}\lib\VC\x64\MDd\libcrypto.lib" libcrypto64MDd.lib
           ren "${{ env.openssl_location }}\lib\VC\x64\MDd\libssl.lib" libssl64MDd.lib
           
-      - name: Install Visual Studio platform toolset v141
+      - name: Install Visual Studio platform toolset v142
         shell: cmd
         run: |
-          "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\setup.exe" modify --quiet --norestart --includeRecommended --installPath "C:\Program Files\Microsoft Visual Studio\2022\Enterprise" --channelId VisualStudio.15.Release --add Microsoft.VisualStudio.Component.VC.v141.x86.x64
+          "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\setup.exe" modify --quiet --norestart --includeRecommended --installPath "C:\Program Files\Microsoft Visual Studio\2022\Enterprise" --channelId VisualStudio.16.Release --add Microsoft.VisualStudio.Component.VC.14.29.16.11.x86.x64
           
       - name: Download Qt ${{ env.Qt_patch_version }}
         shell: pwsh
@@ -57,7 +57,7 @@ jobs:
 
       - uses: ilammy/msvc-dev-cmd@v1
         with:
-          toolset: 14.16
+          toolset: 14.29
       - name: Configure Qt ${{ env.Qt_patch_version }}
         working-directory: C:/qt-everywhere-src-${{ env.Qt_patch_version }}
         shell: cmd
