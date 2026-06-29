@@ -27,13 +27,7 @@ jobs:
           ren "${{ env.openssl_location }}\lib\VC\x64\MDd\libcrypto.lib" libcrypto64MDd.lib
           ren "${{ env.openssl_location }}\lib\VC\x64\MDd\libssl.lib" libssl64MDd.lib
           
-      - name: Install Visual Studio platform toolset v142
-        shell: cmd
-        run: |
-          "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\setup.exe" modify --quiet --norestart --includeRecommended --installPath "C:\Program Files\Microsoft Visual Studio\2022\Enterprise" --channelId VisualStudio.16.Release --add Microsoft.VisualStudio.Component.VC.14.29.16.11.x86.x64
-          
       - name: Download Qt ${{ env.Qt_patch_version }}
-        shell: pwsh
         run: |
           $AllProtocols = [System.Net.SecurityProtocolType]'Tls,Tls11,Tls12'
           [System.Net.ServicePointManager]::SecurityProtocol = $AllProtocols
@@ -52,12 +46,9 @@ jobs:
           del C:\qt-everywhere-opensource-src-${{ env.Qt_patch_version }}.tar
           
       - name: Install Ninja
-        shell: pwsh
         run: choco install ninja
 
       - uses: ilammy/msvc-dev-cmd@v1
-        with:
-          toolset: 14.29
       - name: Configure Qt ${{ env.Qt_patch_version }}
         working-directory: C:/qt-everywhere-src-${{ env.Qt_patch_version }}
         shell: cmd
@@ -159,14 +150,22 @@ jobs:
 
       - name: Build Qt ${{ env.Qt_patch_version }}
         working-directory: C:/qt-everywhere-src-${{ env.Qt_patch_version }}
-        shell: pwsh
         run: nmake
           
       - name: Install Qt ${{ env.Qt_patch_version }}
         working-directory: C:/qt-everywhere-src-${{ env.Qt_patch_version }}
-        shell: pwsh
         run: nmake install
 
+      - name: Copy the config file
+        shell: cmd
+        run: copy "C:\qt-everywhere-src-${{ env.Qt_patch_version }}\config.summary" "C:\Qt\Qt-${{ env.Qt_patch_version }}\"
+
+      - name: Copy OpenSSL files
+        shell: cmd
+        run: |
+          copy "${{ env.openssl_location }}\bin\libcrypto-3-x64.dll" "C:\Qt\Qt-${{ env.Qt_patch_version }}\bin"
+          copy "${{ env.openssl_location }}\bin\libssl-3-x64.dll" "C:\Qt\Qt-${{ env.Qt_patch_version }}\bin"
+          
       - name: Upload Qt library to GitHub repo
         working-directory: C:/
         env:
@@ -182,13 +181,3 @@ jobs:
           git remote add origin https://"%PAT%"@github.com/${{ github.repository_owner }}/Qt-Win-Shared.git
           git remote -v
           git push origin main
-
-      - name: Copy the config file
-        shell: cmd
-        run: copy "C:\qt-everywhere-src-${{ env.Qt_patch_version }}\config.summary" "C:\Qt\Qt-${{ env.Qt_patch_version }}\"
-
-      - name: Copy OpenSSL files
-        shell: cmd
-        run: |
-          copy "${{ env.openssl_location }}\bin\libcrypto-3-x64.dll" "C:\Qt\Qt-${{ env.Qt_patch_version }}\bin"
-          copy "${{ env.openssl_location }}\bin\libssl-3-x64.dll" "C:\Qt\Qt-${{ env.Qt_patch_version }}\bin"
